@@ -50,14 +50,14 @@ export default function Precincts() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleAddPrecinct = () => {
-    if (newPrecinct.name && newPrecinct.location) {
+    if (newPrecinct.name) {
       addPrecinct(newPrecinct);
       setNewPrecinct({ name: "", location: "", tables: 1 });
     }
   };
 
   const handleUpdatePrecinct = () => {
-    if (editPrecinct && editPrecinct.name && editPrecinct.location) {
+    if (editPrecinct && editPrecinct.name) {
       updatePrecinct(editPrecinct.id, {
         name: editPrecinct.name,
         location: editPrecinct.location,
@@ -73,8 +73,7 @@ export default function Precincts() {
 
   const filteredPrecincts = precincts.filter(
     precinct => 
-      precinct.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      precinct.location.toLowerCase().includes(searchTerm.toLowerCase())
+      precinct.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -115,17 +114,6 @@ export default function Precincts() {
                   value={newPrecinct.name}
                   onChange={(e) => setNewPrecinct({ ...newPrecinct, name: e.target.value })}
                   placeholder="Ej: Unidad Educativa Bolivia"
-                />
-              </div>
-              <div className="grid gap-2">
-                <label htmlFor="location" className="text-sm font-medium">
-                  Ubicación
-                </label>
-                <Input
-                  id="location"
-                  value={newPrecinct.location}
-                  onChange={(e) => setNewPrecinct({ ...newPrecinct, location: e.target.value })}
-                  placeholder="Ej: Av. 6 de Agosto, La Paz"
                 />
               </div>
               <div className="grid gap-2">
@@ -170,7 +158,6 @@ export default function Precincts() {
             <TableHeader>
               <TableRow>
                 <TableHead>Nombre</TableHead>
-                <TableHead>Ubicación</TableHead>
                 <TableHead className="text-center">Mesas</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
@@ -179,7 +166,6 @@ export default function Precincts() {
               {filteredPrecincts.map((precinct) => (
                 <TableRow key={precinct.id}>
                   <TableCell className="font-medium">{precinct.name}</TableCell>
-                  <TableCell>{precinct.location}</TableCell>
                   <TableCell className="text-center">{precinct.tables}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
@@ -210,16 +196,6 @@ export default function Precincts() {
                                   id="edit-name"
                                   value={editPrecinct.name}
                                   onChange={(e) => setEditPrecinct({ ...editPrecinct, name: e.target.value })}
-                                />
-                              </div>
-                              <div className="grid gap-2">
-                                <label htmlFor="edit-location" className="text-sm font-medium">
-                                  Ubicación
-                                </label>
-                                <Input
-                                  id="edit-location"
-                                  value={editPrecinct.location}
-                                  onChange={(e) => setEditPrecinct({ ...editPrecinct, location: e.target.value })}
                                 />
                               </div>
                               <div className="grid gap-2">

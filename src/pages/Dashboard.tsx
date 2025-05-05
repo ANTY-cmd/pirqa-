@@ -3,6 +3,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { useElection } from "@/context/ElectionContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Trophy } from "lucide-react";
 
 export default function Dashboard() {
   const { precincts, candidates, votes, getTotalVotesByCandidate } = useElection();
@@ -26,8 +27,15 @@ export default function Dashboard() {
     value: item.votes
   }));
 
-  // Colors for pie chart
+  // Colors for charts
   const COLORS = ['#C75146', '#E49B45', '#4682B4', '#5A7D63', '#8A7E72'];
+
+  // Determine who is winning
+  const leadingCandidate = candidateVotes.length > 0 ? candidateVotes[0] : null;
+  const totalVotesCount = candidateVotes.reduce((sum, candidate) => sum + candidate.votes, 0);
+  const leadingPercentage = leadingCandidate && totalVotesCount > 0 
+    ? ((leadingCandidate.votes / totalVotesCount) * 100).toFixed(2) 
+    : "0";
 
   return (
     <div>
@@ -82,8 +90,32 @@ export default function Dashboard() {
         </Card>
       </div>
 
+      {leadingCandidate && votes.length > 0 && (
+        <Card className="mb-8">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-andes-terra">
+              <Trophy className="h-6 w-6" /> Candidato en Primer Lugar
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-2">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+              <div>
+                <h3 className="text-2xl font-bold text-andes-terra">{leadingCandidate.name}</h3>
+                <p className="text-muted-foreground">{leadingCandidate.party}</p>
+              </div>
+              <div className="mt-2 md:mt-0 flex flex-col items-center md:items-end">
+                <div className="text-3xl font-bold">{leadingCandidate.votes}</div>
+                <div className="text-sm text-muted-foreground">
+                  {leadingPercentage}% de los votos
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {candidates.length > 0 && votes.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <Card className="col-span-1">
             <CardHeader>
               <CardTitle>Distribución de Votos por Candidato</CardTitle>
