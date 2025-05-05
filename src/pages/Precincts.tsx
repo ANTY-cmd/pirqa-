@@ -42,26 +42,58 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// Lista de departamentos de Bolivia
+const BOLIVIA_DEPARTMENTS = [
+  "La Paz",
+  "Cochabamba",
+  "Santa Cruz",
+  "Oruro",
+  "Potosí",
+  "Chuquisaca",
+  "Tarija",
+  "Beni",
+  "Pando"
+];
 
 export default function Precincts() {
   const { precincts, addPrecinct, updatePrecinct, deletePrecinct } = useElection();
-  const [newPrecinct, setNewPrecinct] = useState({ name: "", location: "", tables: 1 });
-  const [editPrecinct, setEditPrecinct] = useState<{ id: string; name: string; location: string; tables: number } | null>(null);
+  const [newPrecinct, setNewPrecinct] = useState({ 
+    name: "", 
+    location: "", 
+    tables: 1, 
+    department: "" 
+  });
+  const [editPrecinct, setEditPrecinct] = useState<{ 
+    id: string; 
+    name: string; 
+    location: string; 
+    tables: number;
+    department: string;
+  } | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleAddPrecinct = () => {
-    if (newPrecinct.name) {
+    if (newPrecinct.name && newPrecinct.department) {
       addPrecinct(newPrecinct);
-      setNewPrecinct({ name: "", location: "", tables: 1 });
+      setNewPrecinct({ name: "", location: "", tables: 1, department: "" });
     }
   };
 
   const handleUpdatePrecinct = () => {
-    if (editPrecinct && editPrecinct.name) {
+    if (editPrecinct && editPrecinct.name && editPrecinct.department) {
       updatePrecinct(editPrecinct.id, {
         name: editPrecinct.name,
         location: editPrecinct.location,
-        tables: editPrecinct.tables
+        tables: editPrecinct.tables,
+        department: editPrecinct.department
       });
       setEditPrecinct(null);
     }
@@ -73,7 +105,8 @@ export default function Precincts() {
 
   const filteredPrecincts = precincts.filter(
     precinct => 
-      precinct.name.toLowerCase().includes(searchTerm.toLowerCase())
+      precinct.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (precinct.department && precinct.department.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -117,6 +150,26 @@ export default function Precincts() {
                 />
               </div>
               <div className="grid gap-2">
+                <label htmlFor="department" className="text-sm font-medium">
+                  Departamento
+                </label>
+                <Select
+                  value={newPrecinct.department}
+                  onValueChange={(value) => setNewPrecinct({ ...newPrecinct, department: value })}
+                >
+                  <SelectTrigger id="department">
+                    <SelectValue placeholder="Selecciona un departamento" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {BOLIVIA_DEPARTMENTS.map((department) => (
+                      <SelectItem key={department} value={department}>
+                        {department}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
                 <label htmlFor="tables" className="text-sm font-medium">
                   Número de Mesas
                 </label>
@@ -134,7 +187,12 @@ export default function Precincts() {
                 <Button variant="outline">Cancelar</Button>
               </DialogClose>
               <DialogClose asChild>
-                <Button onClick={handleAddPrecinct}>Guardar</Button>
+                <Button 
+                  onClick={handleAddPrecinct}
+                  disabled={!newPrecinct.name || !newPrecinct.department}
+                >
+                  Guardar
+                </Button>
               </DialogClose>
             </DialogFooter>
           </DialogContent>
@@ -158,6 +216,7 @@ export default function Precincts() {
             <TableHeader>
               <TableRow>
                 <TableHead>Nombre</TableHead>
+                <TableHead>Departamento</TableHead>
                 <TableHead className="text-center">Mesas</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
@@ -166,6 +225,7 @@ export default function Precincts() {
               {filteredPrecincts.map((precinct) => (
                 <TableRow key={precinct.id}>
                   <TableCell className="font-medium">{precinct.name}</TableCell>
+                  <TableCell>{precinct.department || "—"}</TableCell>
                   <TableCell className="text-center">{precinct.tables}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
@@ -199,6 +259,26 @@ export default function Precincts() {
                                 />
                               </div>
                               <div className="grid gap-2">
+                                <label htmlFor="edit-department" className="text-sm font-medium">
+                                  Departamento
+                                </label>
+                                <Select
+                                  value={editPrecinct.department}
+                                  onValueChange={(value) => setEditPrecinct({ ...editPrecinct, department: value })}
+                                >
+                                  <SelectTrigger id="edit-department">
+                                    <SelectValue placeholder="Selecciona un departamento" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {BOLIVIA_DEPARTMENTS.map((department) => (
+                                      <SelectItem key={department} value={department}>
+                                        {department}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="grid gap-2">
                                 <label htmlFor="edit-tables" className="text-sm font-medium">
                                   Número de Mesas
                                 </label>
@@ -217,7 +297,12 @@ export default function Precincts() {
                               <Button variant="outline">Cancelar</Button>
                             </DialogClose>
                             <DialogClose asChild>
-                              <Button onClick={handleUpdatePrecinct}>Guardar</Button>
+                              <Button 
+                                onClick={handleUpdatePrecinct}
+                                disabled={!editPrecinct?.name || !editPrecinct?.department}
+                              >
+                                Guardar
+                              </Button>
                             </DialogClose>
                           </DialogFooter>
                         </DialogContent>

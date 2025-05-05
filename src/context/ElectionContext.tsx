@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { toast } from "@/components/ui/use-toast";
 
@@ -8,6 +7,7 @@ export interface Precinct {
   name: string;
   location: string;
   tables: number;
+  department: string; // Nuevo campo para el departamento
 }
 
 export interface Candidate {
