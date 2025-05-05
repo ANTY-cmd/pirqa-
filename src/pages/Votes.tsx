@@ -50,6 +50,7 @@ export default function Votes() {
   const [selectedPrecinctId, setSelectedPrecinctId] = useState<string>("");
   const [selectedTableNumber, setSelectedTableNumber] = useState<number | null>(null);
   const [voteData, setVoteData] = useState<VoteFormData>({});
+  const [refresh, setRefresh] = useState<boolean>(false);
   
   const selectedPrecinct = precincts.find(p => p.id === selectedPrecinctId);
 
@@ -69,7 +70,7 @@ export default function Votes() {
     } else {
       setVoteData({});
     }
-  }, [selectedPrecinctId, selectedTableNumber, candidates, getVotesByPrecinctAndTable]);
+  }, [selectedPrecinctId, selectedTableNumber, candidates, getVotesByPrecinctAndTable, refresh]);
 
   const handleSelectPrecinct = (value: string) => {
     setSelectedPrecinctId(value);
@@ -102,6 +103,9 @@ export default function Votes() {
         voteCount: voteData[candidateId]
       });
     }
+    
+    // Forzar actualización para refrescar los datos mostrados
+    setRefresh(prev => !prev);
     
     toast({
       title: "Votos guardados",

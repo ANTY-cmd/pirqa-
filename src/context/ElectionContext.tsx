@@ -140,23 +140,29 @@ export function ElectionProvider({ children }: { children: ReactNode }) {
   // Votes methods
   const addVote = (vote: Omit<Vote, 'id'>) => {
     // Check if a vote for this precinct, table and candidate already exists
-    const existingVote = votes.find(v => 
+    const existingVoteIndex = votes.findIndex(v => 
       v.precinctId === vote.precinctId && 
       v.tableNumber === vote.tableNumber &&
       v.candidateId === vote.candidateId
     );
 
-    if (existingVote) {
-      // Update the existing vote
-      updateVote(existingVote.id, { voteCount: vote.voteCount });
-      return;
+    if (existingVoteIndex !== -1) {
+      // Update the existing vote by creating a new array
+      const updatedVotes = [...votes];
+      updatedVotes[existingVoteIndex] = {
+        ...updatedVotes[existingVoteIndex],
+        voteCount: vote.voteCount
+      };
+      setVotes(updatedVotes);
+    } else {
+      // Add a new vote
+      const newVote = {
+        ...vote,
+        id: crypto.randomUUID(),
+      };
+      setVotes(prev => [...prev, newVote]);
     }
 
-    const newVote = {
-      ...vote,
-      id: crypto.randomUUID(),
-    };
-    setVotes([...votes, newVote]);
     toast({
       title: "Votos registrados",
       description: `Se han registrado ${vote.voteCount} votos para la mesa ${vote.tableNumber}`,
